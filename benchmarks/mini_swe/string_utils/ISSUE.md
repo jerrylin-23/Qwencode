@@ -1,0 +1,1 @@
+The reverse_string function returns the original string unmodified. It needs to properly reverse it.

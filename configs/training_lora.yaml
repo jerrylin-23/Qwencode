@@ -1,0 +1,21 @@
+# LoRA Fine-Tuning Configuration
+model_id: "Qwen/Qwen2.5-Coder-7B"
+output_dir: "outputs/checkpoints/sft_v1"
+adapter_dir: "outputs/adapters/sft_v1"
+log_dir: "outputs/logs/sft_v1"
+
+# Hyperparameters
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+learning_rate: 0.00005
+epochs: 3
+batch_size: 2
+gradient_accumulation_steps: 4
+max_seq_length: 4096
+optimizer: "paged_adamw_8bit"
+
+# Dataset splits
+train_dataset: "data/processed/sft_train.jsonl"
+valid_dataset: "data/processed/sft_valid.jsonl"
+test_dataset: "data/processed/sft_test_heldout.jsonl"

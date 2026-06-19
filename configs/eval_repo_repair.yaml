@@ -1,0 +1,8 @@
+# Repository Repair Configuration
+model_config: "configs/model.yaml"
+benchmark_dir: "benchmarks/mini_swe"
+output_dir: "reports/repo_repair_runs"
+num_retries: 3
+use_retrieval: true
+max_context_length: 8000
+verbose: true

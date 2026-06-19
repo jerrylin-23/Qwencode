@@ -1,0 +1,197 @@
+import yaml
+import json
+import time
+import shutil
+import tempfile
+import argparse
+from pathlib import Path
+from datetime import datetime
+from rich.console import Console
+from rich.table import Table
+
+from code_model_lab.repo_repair.localize_issue import localize_bug
+from code_model_lab.repo_repair.generate_patch import generate_bug_patch
+from code_model_lab.repo_repair.apply_patch import apply_patch_to_repo
+from code_model_lab.repo_repair.run_tests import run_repo_tests
+
+console = Console()
+
+def run_repair_loop(config_path: Path):
+    with open(config_path, "r") as f:
+        config = yaml.safe_load(f)
+        
+    model_config_path = Path(config["model_config"])
+    if not model_config_path.is_absolute():
+        candidate = config_path.parent / model_config_path
+        if candidate.exists():
+            model_config_path = candidate
+        
+    with open(model_config_path, "r") as f:
+        m_config = yaml.safe_load(f)
+        
+    # Initialize client
+    from code_model_lab.models import get_model_client
+    client = get_model_client(m_config)
+    
+    benchmark_dir = Path(config["benchmark_dir"])
+    if not benchmark_dir.exists():
+        benchmark_dir = Path("/Users/jerry/Projects/Qwencode") / config["benchmark_dir"]
+        
+    console.print(f"[bold green]Starting Repository Repair Loop on {benchmark_dir}...[/bold green]")
+    
+    repos = [p for p in benchmark_dir.iterdir() if p.is_dir() and (p / "metadata.json").exists()]
+    repos.sort()
+    
+    results = []
+    total_repos = len(repos)
+    resolved_count = 0
+    applied_count = 0
+    total_retries = 0
+    
+    start_time = time.time()
+    
+    for repo in repos:
+        console.print(f"\n[bold blue]Analyzing Repository: {repo.name}[/bold blue]")
+        
+        # Load metadata and issue
+        with open(repo / "metadata.json", "r") as f:
+            _metadata = json.load(f)
+        with open(repo / "ISSUE.md", "r") as f:
+            issue_desc = f.read()
+            
+        # Create temp dir for testing patch
+        with tempfile.TemporaryDirectory() as tmpdir:
+            temp_repo = Path(tmpdir) / repo.name
+            shutil.copytree(repo, temp_repo)
+            
+            # Step 1: Run tests initially (sanity check, should fail)
+            initial_res = run_repo_tests(temp_repo)
+            console.print(f"  Initial test status: [yellow]{initial_res['status']}[/yellow] (Passed: {initial_res['passed']})")
+            
+            # Step 2: Localize issue
+            console.print("  Localizing bug fault files/symbols...")
+            loc_res = localize_bug(temp_repo, issue_desc, client)
+            console.print(f"  Likely files: {[f['path'] for f in loc_res['likely_files']]}")
+            
+            max_retries = config.get("num_retries", 3)
+            retry_count = 0
+            resolved = False
+            patch_applied = False
+            last_error_log = initial_res.get("message", "Tests failed.")
+            final_patch = ""
+            
+            while retry_count <= max_retries and not resolved:
+                if retry_count > 0:
+                    console.print(f"  [yellow]Retry {retry_count}/{max_retries} with test execution feedback...[/yellow]")
+                    
+                # Modify issue description or construct prompt incorporating error log
+                current_issue = issue_desc
+                if retry_count > 0:
+                    current_issue = f"{issue_desc}\n\nPrevious patch failed. Test log feedback:\n{last_error_log}"
+                    
+                # Clean up repo back to original state before applying new patch
+                shutil.rmtree(temp_repo)
+                shutil.copytree(repo, temp_repo)
+                
+                # Step 3: Generate patch
+                patch = generate_bug_patch(temp_repo, current_issue, loc_res["likely_files"], client)
+                
+                if patch:
+                    # Step 4: Apply patch
+                    patch_applied = apply_patch_to_repo(temp_repo, patch)
+                    if patch_applied:
+                        console.print("    Patch applied successfully.")
+                        final_patch = patch
+                        
+                        # Step 5: Run tests
+                        test_res = run_repo_tests(temp_repo)
+                        if test_res["passed"]:
+                            console.print("    [green]Tests PASSED! Issue resolved.[/green]")
+                            resolved = True
+                        else:
+                            console.print(f"    [red]Tests FAILED ({test_res['status']})[/red]")
+                            last_error_log = test_res.get("message", "Tests failed.")
+                    else:
+                        console.print("    [red]Failed to apply patch.[/red]")
+                        last_error_log = "Unified diff failed to apply to repository files."
+                else:
+                    console.print("    [red]No patch generated by model.[/red]")
+                    last_error_log = "Model failed to output a diff patch."
+                    
+                retry_count += 1
+                if not resolved:
+                    total_retries += 1
+                    
+            if resolved:
+                resolved_count += 1
+            if patch_applied:
+                applied_count += 1
+                
+            results.append({
+                "repo_name": repo.name,
+                "resolved": resolved,
+                "patch_applied": patch_applied,
+                "retries": min(retry_count - 1, max_retries),
+                "patch": final_patch,
+                "localized_files": [f["path"] for f in loc_res["likely_files"]]
+            })
+            
+    duration = time.time() - start_time
+    
+    # Compute metrics
+    resolved_pct = (resolved_count / total_repos) * 100 if total_repos else 0
+    applied_pct = (applied_count / total_repos) * 100 if total_repos else 0
+    avg_retries = total_retries / total_repos if total_repos else 0
+    
+    # Print summary table
+    table = Table(title="SWE-bench-style Repository Repair Metrics")
+    table.add_column("Metric", style="cyan")
+    table.add_column("Value", style="magenta")
+    table.add_row("Total Repositories", str(total_repos))
+    table.add_row("Resolved (All Tests Pass)", f"{resolved_count} ({resolved_pct:.1f}%)")
+    table.add_row("Patch Applied successfully", f"{applied_count} ({applied_pct:.1f}%)")
+    table.add_row("Avg Retries per Repo", f"{avg_retries:.2f}")
+    table.add_row("Total Duration", f"{duration:.1f}s")
+    console.print(table)
+    
+    # Save reports
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_dir = Path(config.get("output_dir", "reports/repo_repair_runs")) / timestamp
+    output_dir.mkdir(parents=True, exist_ok=True)
+    
+    report_file = output_dir / "report.json"
+    with open(report_file, "w") as f:
+        json.dump({
+            "metrics": {
+                "total_repos": total_repos,
+                "resolved_count": resolved_count,
+                "resolved_percentage": resolved_pct,
+                "applied_percentage": applied_pct,
+                "average_retries": avg_retries,
+                "duration_seconds": duration
+            },
+            "results": results
+        }, f, indent=2)
+        
+    # Write a static repo repair report
+    static_report = Path("reports/repo_repair_results.md")
+    static_report.parent.mkdir(parents=True, exist_ok=True)
+    with open(static_report, "w") as f:
+        f.write("# Repository Repair Evaluation Results\n\n")
+        f.write(f"Generated on {timestamp} (Evaluation Mode: {client.eval_mode}).\n\n")
+        f.write("| Model | Resolved % | Patch Applies % | Avg Retries | Notes |\n")
+        f.write("|---|---|---|---|---|\n")
+        f.write(f"| {client.model_name} | {resolved_pct:.1f}% | {applied_pct:.1f}% | {avg_retries:.2f} | Eval Mode: {client.eval_mode} |\n")
+
+    console.print(f"[bold green]Report saved to {report_file}[/bold green]")
+    console.print(f"[bold green]Evaluation results saved to {static_report}[/bold green]")
+
+def main():
+    parser = argparse.ArgumentParser(description="Run Repository Repair Loop.")
+    parser.add_argument("--config", type=str, default="configs/eval_repo_repair.yaml", help="Path to repo repair config.")
+    args = parser.parse_args()
+    
+    run_repair_loop(Path(args.config))
+
+if __name__ == "__main__":
+    main()

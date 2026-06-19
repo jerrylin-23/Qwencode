@@ -1,0 +1,10 @@
+{
+  "name": "string_utils",
+  "test_command": "pytest tests/test_utils.py",
+  "relevant_files": [
+    "src/utils.py"
+  ],
+  "localized_symbols": [
+    "reverse_string"
+  ]
+}

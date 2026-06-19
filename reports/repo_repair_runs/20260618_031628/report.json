@@ -1,0 +1,112 @@
+{
+  "metrics": {
+    "total_repos": 10,
+    "resolved_count": 2,
+    "resolved_percentage": 20.0,
+    "applied_percentage": 20.0,
+    "average_retries": 3.2,
+    "duration_seconds": 2.105372905731201
+  },
+  "results": [
+    {
+      "repo_name": "calculator",
+      "resolved": true,
+      "patch_applied": true,
+      "retries": 0,
+      "patch": "diff --git a/src/calculator.py b/src/calculator.py\nindex 1234567..89abcde 100644\n--- a/src/calculator.py\n+++ b/src/calculator.py\n@@ -10,3 +10,5 @@ def divide(a, b):\n-    return a / b\n+    if b == 0:\n+        raise ValueError(\"Cannot divide by zero\")\n+    return a / b",
+      "localized_files": [
+        "src/calculator.py"
+      ]
+    },
+    {
+      "repo_name": "dummy_repo_10",
+      "resolved": false,
+      "patch_applied": false,
+      "retries": 3,
+      "patch": "",
+      "localized_files": [
+        "src/main.py"
+      ]
+    },
+    {
+      "repo_name": "dummy_repo_3",
+      "resolved": false,
+      "patch_applied": false,
+      "retries": 3,
+      "patch": "",
+      "localized_files": [
+        "src/main.py"
+      ]
+    },
+    {
+      "repo_name": "dummy_repo_4",
+      "resolved": false,
+      "patch_applied": false,
+      "retries": 3,
+      "patch": "",
+      "localized_files": [
+        "src/main.py"
+      ]
+    },
+    {
+      "repo_name": "dummy_repo_5",
+      "resolved": false,
+      "patch_applied": false,
+      "retries": 3,
+      "patch": "",
+      "localized_files": [
+        "src/main.py"
+      ]
+    },
+    {
+      "repo_name": "dummy_repo_6",
+      "resolved": false,
+      "patch_applied": false,
+      "retries": 3,
+      "patch": "",
+      "localized_files": [
+        "src/main.py"
+      ]
+    },
+    {
+      "repo_name": "dummy_repo_7",
+      "resolved": false,
+      "patch_applied": false,
+      "retries": 3,
+      "patch": "",
+      "localized_files": [
+        "src/main.py"
+      ]
+    },
+    {
+      "repo_name": "dummy_repo_8",
+      "resolved": false,
+      "patch_applied": false,
+      "retries": 3,
+      "patch": "",
+      "localized_files": [
+        "src/main.py"
+      ]
+    },
+    {
+      "repo_name": "dummy_repo_9",
+      "resolved": false,
+      "patch_applied": false,
+      "retries": 3,
+      "patch": "",
+      "localized_files": [
+        "src/main.py"
+      ]
+    },
+    {
+      "repo_name": "string_utils",
+      "resolved": true,
+      "patch_applied": true,
+      "retries": 0,
+      "patch": "diff --git a/src/utils.py b/src/utils.py\nindex 1234567..89abcde 100644\n--- a/src/utils.py\n+++ b/src/utils.py\n@@ -5,3 +5,3 @@ def reverse_string(s):\n-    return s\n+    return s[::-1]",
+      "localized_files": [
+        "src/utils.py"
+      ]
+    }
+  ]
+}

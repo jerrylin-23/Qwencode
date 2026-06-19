@@ -1,0 +1,512 @@
+{
+  "metrics": {
+    "total_tasks": 50,
+    "passed_tasks": 50,
+    "pass_rate": 100.0,
+    "compile_rate": 100.0,
+    "avg_retries": 0.0,
+    "duration_seconds": 11.92082691192627
+  },
+  "results": [
+    {
+      "id": "prac_000001",
+      "entrypoint": "filter_dataframe",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 3.0994415283203125e-06,
+      "code": "import pandas as pd\ndef filter_dataframe(df):\n    return df[df['age'] > 21].reset_index(drop=True)"
+    },
+    {
+      "id": "prac_000002",
+      "entrypoint": "filter_dataframe",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 7.152557373046875e-06,
+      "code": "import pandas as pd\ndef filter_dataframe(df):\n    return df[df['age'] > 22].reset_index(drop=True)"
+    },
+    {
+      "id": "prac_000003",
+      "entrypoint": "filter_dataframe",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 3.814697265625e-06,
+      "code": "import pandas as pd\ndef filter_dataframe(df):\n    return df[df['age'] > 23].reset_index(drop=True)"
+    },
+    {
+      "id": "prac_000004",
+      "entrypoint": "filter_dataframe",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 3.814697265625e-06,
+      "code": "import pandas as pd\ndef filter_dataframe(df):\n    return df[df['age'] > 24].reset_index(drop=True)"
+    },
+    {
+      "id": "prac_000005",
+      "entrypoint": "filter_dataframe",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.0531158447265625e-06,
+      "code": "import pandas as pd\ndef filter_dataframe(df):\n    return df[df['age'] > 25].reset_index(drop=True)"
+    },
+    {
+      "id": "prac_000006",
+      "entrypoint": "filter_dataframe",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.0531158447265625e-06,
+      "code": "import pandas as pd\ndef filter_dataframe(df):\n    return df[df['age'] > 26].reset_index(drop=True)"
+    },
+    {
+      "id": "prac_000007",
+      "entrypoint": "filter_dataframe",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 3.0994415283203125e-06,
+      "code": "import pandas as pd\ndef filter_dataframe(df):\n    return df[df['age'] > 27].reset_index(drop=True)"
+    },
+    {
+      "id": "prac_000008",
+      "entrypoint": "filter_dataframe",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 3.814697265625e-06,
+      "code": "import pandas as pd\ndef filter_dataframe(df):\n    return df[df['age'] > 28].reset_index(drop=True)"
+    },
+    {
+      "id": "prac_000009",
+      "entrypoint": "filter_dataframe",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 3.0994415283203125e-06,
+      "code": "import pandas as pd\ndef filter_dataframe(df):\n    return df[df['age'] > 29].reset_index(drop=True)"
+    },
+    {
+      "id": "prac_000010",
+      "entrypoint": "filter_dataframe",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 3.0994415283203125e-06,
+      "code": "import pandas as pd\ndef filter_dataframe(df):\n    return df[df['age'] > 30].reset_index(drop=True)"
+    },
+    {
+      "id": "prac_000011",
+      "entrypoint": "filter_dataframe",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 3.814697265625e-06,
+      "code": "import pandas as pd\ndef filter_dataframe(df):\n    return df[df['age'] > 31].reset_index(drop=True)"
+    },
+    {
+      "id": "prac_000012",
+      "entrypoint": "filter_dataframe",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 3.814697265625e-06,
+      "code": "import pandas as pd\ndef filter_dataframe(df):\n    return df[df['age'] > 32].reset_index(drop=True)"
+    },
+    {
+      "id": "prac_000013",
+      "entrypoint": "filter_dataframe",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 6.198883056640625e-06,
+      "code": "import pandas as pd\ndef filter_dataframe(df):\n    return df[df['age'] > 33].reset_index(drop=True)"
+    },
+    {
+      "id": "prac_000014",
+      "entrypoint": "filter_dataframe",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 2.86102294921875e-06,
+      "code": "import pandas as pd\ndef filter_dataframe(df):\n    return df[df['age'] > 34].reset_index(drop=True)"
+    },
+    {
+      "id": "prac_000015",
+      "entrypoint": "filter_dataframe",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.0531158447265625e-06,
+      "code": "import pandas as pd\ndef filter_dataframe(df):\n    return df[df['age'] > 35].reset_index(drop=True)"
+    },
+    {
+      "id": "prac_000016",
+      "entrypoint": "extract_json_key",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.76837158203125e-06,
+      "code": "import json\ndef extract_json_key(json_str):\n    try:\n        data = json.loads(json_str)\n        return data.get('key_16')\n    except Exception:\n        return None"
+    },
+    {
+      "id": "prac_000017",
+      "entrypoint": "extract_json_key",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 6.9141387939453125e-06,
+      "code": "import json\ndef extract_json_key(json_str):\n    try:\n        data = json.loads(json_str)\n        return data.get('key_17')\n    except Exception:\n        return None"
+    },
+    {
+      "id": "prac_000018",
+      "entrypoint": "extract_json_key",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.76837158203125e-06,
+      "code": "import json\ndef extract_json_key(json_str):\n    try:\n        data = json.loads(json_str)\n        return data.get('key_18')\n    except Exception:\n        return None"
+    },
+    {
+      "id": "prac_000019",
+      "entrypoint": "extract_json_key",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 5.0067901611328125e-06,
+      "code": "import json\ndef extract_json_key(json_str):\n    try:\n        data = json.loads(json_str)\n        return data.get('key_19')\n    except Exception:\n        return None"
+    },
+    {
+      "id": "prac_000020",
+      "entrypoint": "extract_json_key",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 3.814697265625e-06,
+      "code": "import json\ndef extract_json_key(json_str):\n    try:\n        data = json.loads(json_str)\n        return data.get('key_20')\n    except Exception:\n        return None"
+    },
+    {
+      "id": "prac_000021",
+      "entrypoint": "extract_json_key",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.76837158203125e-06,
+      "code": "import json\ndef extract_json_key(json_str):\n    try:\n        data = json.loads(json_str)\n        return data.get('key_21')\n    except Exception:\n        return None"
+    },
+    {
+      "id": "prac_000022",
+      "entrypoint": "extract_json_key",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.0531158447265625e-06,
+      "code": "import json\ndef extract_json_key(json_str):\n    try:\n        data = json.loads(json_str)\n        return data.get('key_22')\n    except Exception:\n        return None"
+    },
+    {
+      "id": "prac_000023",
+      "entrypoint": "extract_json_key",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 6.198883056640625e-06,
+      "code": "import json\ndef extract_json_key(json_str):\n    try:\n        data = json.loads(json_str)\n        return data.get('key_23')\n    except Exception:\n        return None"
+    },
+    {
+      "id": "prac_000024",
+      "entrypoint": "extract_json_key",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.0531158447265625e-06,
+      "code": "import json\ndef extract_json_key(json_str):\n    try:\n        data = json.loads(json_str)\n        return data.get('key_24')\n    except Exception:\n        return None"
+    },
+    {
+      "id": "prac_000025",
+      "entrypoint": "extract_json_key",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.76837158203125e-06,
+      "code": "import json\ndef extract_json_key(json_str):\n    try:\n        data = json.loads(json_str)\n        return data.get('key_25')\n    except Exception:\n        return None"
+    },
+    {
+      "id": "prac_000026",
+      "entrypoint": "extract_json_key",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.76837158203125e-06,
+      "code": "import json\ndef extract_json_key(json_str):\n    try:\n        data = json.loads(json_str)\n        return data.get('key_26')\n    except Exception:\n        return None"
+    },
+    {
+      "id": "prac_000027",
+      "entrypoint": "extract_json_key",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 5.9604644775390625e-06,
+      "code": "import json\ndef extract_json_key(json_str):\n    try:\n        data = json.loads(json_str)\n        return data.get('key_27')\n    except Exception:\n        return None"
+    },
+    {
+      "id": "prac_000028",
+      "entrypoint": "extract_json_key",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 5.9604644775390625e-06,
+      "code": "import json\ndef extract_json_key(json_str):\n    try:\n        data = json.loads(json_str)\n        return data.get('key_28')\n    except Exception:\n        return None"
+    },
+    {
+      "id": "prac_000029",
+      "entrypoint": "extract_json_key",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.291534423828125e-06,
+      "code": "import json\ndef extract_json_key(json_str):\n    try:\n        data = json.loads(json_str)\n        return data.get('key_29')\n    except Exception:\n        return None"
+    },
+    {
+      "id": "prac_000030",
+      "entrypoint": "extract_json_key",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.0531158447265625e-06,
+      "code": "import json\ndef extract_json_key(json_str):\n    try:\n        data = json.loads(json_str)\n        return data.get('key_30')\n    except Exception:\n        return None"
+    },
+    {
+      "id": "prac_000031",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 5.0067901611328125e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_31', 'REDACTED')"
+    },
+    {
+      "id": "prac_000032",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.76837158203125e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_32', 'REDACTED')"
+    },
+    {
+      "id": "prac_000033",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 5.0067901611328125e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_33', 'REDACTED')"
+    },
+    {
+      "id": "prac_000034",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 5.245208740234375e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_34', 'REDACTED')"
+    },
+    {
+      "id": "prac_000035",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 6.9141387939453125e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_35', 'REDACTED')"
+    },
+    {
+      "id": "prac_000036",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.291534423828125e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_36', 'REDACTED')"
+    },
+    {
+      "id": "prac_000037",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 5.0067901611328125e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_37', 'REDACTED')"
+    },
+    {
+      "id": "prac_000038",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 5.245208740234375e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_38', 'REDACTED')"
+    },
+    {
+      "id": "prac_000039",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.0531158447265625e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_39', 'REDACTED')"
+    },
+    {
+      "id": "prac_000040",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.291534423828125e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_40', 'REDACTED')"
+    },
+    {
+      "id": "prac_000041",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.0531158447265625e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_41', 'REDACTED')"
+    },
+    {
+      "id": "prac_000042",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.0531158447265625e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_42', 'REDACTED')"
+    },
+    {
+      "id": "prac_000043",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.0531158447265625e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_43', 'REDACTED')"
+    },
+    {
+      "id": "prac_000044",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.291534423828125e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_44', 'REDACTED')"
+    },
+    {
+      "id": "prac_000045",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 3.0994415283203125e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_45', 'REDACTED')"
+    },
+    {
+      "id": "prac_000046",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 5.245208740234375e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_46', 'REDACTED')"
+    },
+    {
+      "id": "prac_000047",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 3.814697265625e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_47', 'REDACTED')"
+    },
+    {
+      "id": "prac_000048",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 5.9604644775390625e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_48', 'REDACTED')"
+    },
+    {
+      "id": "prac_000049",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 4.0531158447265625e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_49', 'REDACTED')"
+    },
+    {
+      "id": "prac_000050",
+      "entrypoint": "clean_text_pattern",
+      "status": "passed",
+      "passed": true,
+      "compiled": true,
+      "retries": 0,
+      "latency": 3.814697265625e-06,
+      "code": "def clean_text_pattern(text):\n    return text.replace('id_50', 'REDACTED')"
+    }
+  ]
+}

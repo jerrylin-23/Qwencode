@@ -1,0 +1,8 @@
+diff --git a/src/main.py b/src/main.py
+index 1234567..89abcde 100644
+--- a/src/main.py
++++ b/src/main.py
+@@ -1,2 +1,2 @@
+ def run_task_6():
+-    return False
++    return True

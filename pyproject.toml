@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "code-model-lab"
+version = "0.1.0"
+description = "A research-inspired local project that improves a lower-cost open-weight coding model."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2.0.0",
+    "pyyaml",
+    "rich",
+    "tqdm",
+    "pandas",
+    "numpy",
+    "pytest",
+    "ruff",
+    "requests",
+    "gitpython",
+    "transformers",
+    "peft",
+    "accelerate"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = ["benchmarks", "venv", ".git"]

@@ -1,0 +1,1 @@
+The divide function raises ZeroDivisionError when dividing by zero, but it should raise ValueError with 'Cannot divide by zero' message instead.

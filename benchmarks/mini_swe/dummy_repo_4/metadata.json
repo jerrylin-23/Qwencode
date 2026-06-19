@@ -1,0 +1,10 @@
+{
+  "name": "dummy_repo_4",
+  "test_command": "pytest tests/test_main.py",
+  "relevant_files": [
+    "src/main.py"
+  ],
+  "localized_symbols": [
+    "run_task_4"
+  ]
+}

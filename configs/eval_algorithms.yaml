@@ -1,0 +1,9 @@
+# Algorithmic Evaluation Configuration
+model_config: "configs/model.yaml"
+eval_dataset: "data/processed/sample_algorithmic.jsonl"
+output_dir: "reports/eval_runs"
+num_retries: 3
+timeout_per_test: 2.0
+num_samples: 1 # pass@1 evaluation
+compile_only: false
+verbose: true
