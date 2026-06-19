@@ -288,6 +288,85 @@ def _largest_rectangle_ref(heights):
 
 
 # --------------------------------------------------------------------------
+# Reference solutions — adversarial families
+#
+# Each is phrased to lure a pattern-matcher toward a famous neighbour problem
+# (two-sum, plain Kadane, exact binary search, Fibonacci stairs, sorted[-2]).
+# --------------------------------------------------------------------------
+
+def _count_pairs_below_ref(nums, target):
+    nums = sorted(nums)
+    lo, hi, c = 0, len(nums) - 1, 0
+    while lo < hi:
+        if nums[lo] + nums[hi] < target:
+            c += hi - lo
+            lo += 1
+        else:
+            hi -= 1
+    return c
+
+
+def _second_largest_distinct_ref(nums):
+    u = sorted(set(nums))
+    return u[-2] if len(u) >= 2 else None
+
+
+def _climb_no_double2_ref(n):
+    from functools import lru_cache
+
+    @lru_cache(None)
+    def go(pos, prev_was_two):
+        if pos == n:
+            return 1
+        if pos > n:
+            return 0
+        total = go(pos + 1, False)
+        if not prev_was_two:
+            total += go(pos + 2, True)
+        return total
+
+    return go(0, False)
+
+
+def _max_subarray_len2_ref(nums):
+    best = None
+    for i in range(len(nums)):
+        s = nums[i]
+        for j in range(i + 1, len(nums)):
+            s += nums[j]
+            best = s if best is None else max(best, s)
+    return best
+
+
+def _lower_bound_ref(nums, target):
+    lo, hi = 0, len(nums)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if nums[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid
+    return lo
+
+
+def _max_circular_subarray_ref(nums):
+    total = 0
+    cur_max = 0
+    best_max = nums[0]
+    cur_min = 0
+    best_min = nums[0]
+    for x in nums:
+        cur_max = x + max(cur_max, 0)
+        best_max = max(best_max, cur_max)
+        cur_min = x + min(cur_min, 0)
+        best_min = min(best_min, cur_min)
+        total += x
+    if best_max < 0:
+        return best_max
+    return max(best_max, total - best_min)
+
+
+# --------------------------------------------------------------------------
 # Input samplers
 # --------------------------------------------------------------------------
 
@@ -344,6 +423,28 @@ def _prices_sampler(rng):
 
 def _hist_sampler(rng):
     return ([rng.randint(0, 8) for _ in range(rng.randint(1, 10))],)
+
+
+def _pairs_below_sampler(rng):
+    return (_rand_list(rng, lo=-8, hi=8, n_lo=2, n_hi=8), rng.randint(-6, 10))
+
+
+def _dup_list_sampler(rng):
+    # include duplicates so 'second largest distinct' differs from sorted[-2]
+    return ([rng.choice(range(-5, 6)) for _ in range(rng.randint(1, 8))],)
+
+
+def _sorted_dup_sampler(rng):
+    arr = sorted(rng.choice(range(0, 8)) for _ in range(rng.randint(0, 8)))
+    return (arr, rng.randint(0, 8))
+
+
+def _neg_list2_sampler(rng):
+    return (_rand_list(rng, lo=-9, hi=9, n_lo=2, n_hi=8),)
+
+
+def _neg_list_sampler(rng):
+    return (_rand_list(rng, lo=-9, hi=9, n_lo=1, n_hi=8),)
 
 
 # --------------------------------------------------------------------------
@@ -586,6 +687,93 @@ HARD_FAMILIES: List[Family] = [
 ]
 
 
+# Adversarial families: the problem statement deliberately resembles a famous
+# problem but changes one requirement. Pattern-matching to the neighbour gives a
+# wrong answer. This is the eval most likely to separate base from fine-tuned.
+ADVERSARIAL_FAMILIES: List[Family] = [
+    Family(
+        "pairs_below", "count_pairs_below", "hard", ["two pointers", "arrays"],
+        "Given an array `nums` and an integer `target`, return the NUMBER of "
+        "unordered index pairs (i, j) with i < j whose sum is STRICTLY LESS THAN "
+        "`target`. (Note: this is a count of pairs below a threshold, not the "
+        "classic two-sum that finds one pair equal to the target.)",
+        "2 <= nums.length <= 1000",
+        "def count_pairs_below(nums, target):\n    nums = sorted(nums)\n    lo, hi, c = 0, len(nums) - 1, 0\n    while lo < hi:\n        if nums[lo] + nums[hi] < target:\n            c += hi - lo\n            lo += 1\n        else:\n            hi -= 1\n    return c",
+        _count_pairs_below_ref, _pairs_below_sampler,
+        "O(N log N)", "O(1)",
+        "Sort, then two-pointer: when nums[lo]+nums[hi] < target, all hi-lo pairs with lo qualify.",
+        "def count_pairs_below(nums, target):\n    seen = {}\n    for i, n in enumerate(nums):\n        if target - n in seen:\n            return [seen[target - n], i]\n        seen[n] = i\n    return []",
+        "Pattern-matches to two-sum (returns one equal-sum pair) instead of counting pairs below target.",
+    ),
+    Family(
+        "second_largest_distinct", "second_largest_distinct", "medium", ["arrays", "hash maps"],
+        "Return the second largest DISTINCT value in `nums`. If there are fewer "
+        "than two distinct values, return None. (Duplicates of the maximum do not "
+        "count as the second largest.)",
+        "1 <= nums.length <= 10^4",
+        "def second_largest_distinct(nums):\n    u = sorted(set(nums))\n    return u[-2] if len(u) >= 2 else None",
+        _second_largest_distinct_ref, _dup_list_sampler,
+        "O(N log N)", "O(N)",
+        "Deduplicate first, then take the second largest of the distinct values.",
+        "def second_largest_distinct(nums):\n    nums.sort()\n    return nums[-2]",
+        "Returns sorted[-2] including duplicates, so a repeated maximum is wrongly reported.",
+    ),
+    Family(
+        "stairs_no_double2", "climb_no_double2", "hard", ["dynamic programming"],
+        "You climb `n` stairs taking 1 or 2 steps at a time, but you may NEVER "
+        "take two 2-steps in a row. Return the number of distinct ways to reach "
+        "the top. (This is NOT the plain climbing-stairs Fibonacci count.)",
+        "1 <= n <= 40",
+        "def climb_no_double2(n):\n    from functools import lru_cache\n\n    @lru_cache(None)\n    def go(pos, prev_was_two):\n        if pos == n:\n            return 1\n        if pos > n:\n            return 0\n        total = go(pos + 1, False)\n        if not prev_was_two:\n            total += go(pos + 2, True)\n        return total\n\n    return go(0, False)",
+        _climb_no_double2_ref, lambda rng: (rng.randint(1, 22),),
+        "O(N)", "O(N)",
+        "DP with a state bit for whether the previous step was a 2; a 2-step is only allowed if the previous wasn't.",
+        "def climb_no_double2(n):\n    a, b = 1, 1\n    for _ in range(n):\n        a, b = b, a + b\n    return a",
+        "Plain Fibonacci stairs count, ignoring the no-consecutive-double-step rule.",
+    ),
+    Family(
+        "max_subarray_len2", "max_subarray_len2", "medium", ["arrays", "dynamic programming"],
+        "Return the maximum sum of a contiguous subarray of `nums` that contains "
+        "AT LEAST TWO elements. (Unlike classic maximum-subarray, a single "
+        "element is not a valid answer.)",
+        "2 <= nums.length <= 1000",
+        "def max_subarray_len2(nums):\n    best = None\n    for i in range(len(nums)):\n        s = nums[i]\n        for j in range(i + 1, len(nums)):\n            s += nums[j]\n            best = s if best is None else max(best, s)\n    return best",
+        _max_subarray_len2_ref, _neg_list2_sampler,
+        "O(N)", "O(1)",
+        "A length>=2 variant of Kadane: never allow a window to shrink below two elements.",
+        "def max_subarray_len2(nums):\n    best = cur = nums[0]\n    for n in nums[1:]:\n        cur = max(n, cur + n)\n        best = max(best, cur)\n    return best",
+        "Classic Kadane allows length-1 subarrays, overcounting when a lone large element beats every pair.",
+    ),
+    Family(
+        "lower_bound", "lower_bound", "medium", ["binary search", "arrays"],
+        "Given an ascending sorted array `nums` (which may contain duplicates) "
+        "and a `target`, return the index of the FIRST element greater than or "
+        "equal to `target`, or len(nums) if no such element exists. (This is "
+        "lower-bound insertion position, not an exact-match search.)",
+        "0 <= nums.length <= 10^4",
+        "def lower_bound(nums, target):\n    lo, hi = 0, len(nums)\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if nums[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid\n    return lo",
+        _lower_bound_ref, _sorted_dup_sampler,
+        "O(log N)", "O(1)",
+        "Binary search for the leftmost position where target could be inserted while keeping order.",
+        "def lower_bound(nums, target):\n    lo, hi = 0, len(nums) - 1\n    while lo <= hi:\n        mid = (lo + hi) // 2\n        if nums[mid] == target:\n            return mid\n        if nums[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid - 1\n    return -1",
+        "Exact-match binary search returns -1 (or a duplicate's middle index) instead of the first >= target.",
+    ),
+    Family(
+        "max_circular", "max_circular_subarray", "hard", ["dynamic programming", "arrays"],
+        "Return the maximum possible sum of a non-empty subarray of `nums` where "
+        "the array is CIRCULAR, i.e. the subarray may wrap around from the end "
+        "back to the beginning. (Plain maximum-subarray does not allow wrap-around.)",
+        "1 <= nums.length <= 3*10^4",
+        "def max_circular_subarray(nums):\n    total = 0\n    cur_max = 0\n    best_max = nums[0]\n    cur_min = 0\n    best_min = nums[0]\n    for x in nums:\n        cur_max = x + max(cur_max, 0)\n        best_max = max(best_max, cur_max)\n        cur_min = x + min(cur_min, 0)\n        best_min = min(best_min, cur_min)\n        total += x\n    if best_max < 0:\n        return best_max\n    return max(best_max, total - best_min)",
+        _max_circular_subarray_ref, _neg_list_sampler,
+        "O(N)", "O(1)",
+        "Answer is max(standard Kadane, total - minimum subarray); the all-negative case must return the plain max.",
+        "def max_circular_subarray(nums):\n    best = cur = nums[0]\n    for n in nums[1:]:\n        cur = max(n, cur + n)\n        best = max(best, cur)\n    return best",
+        "Plain Kadane misses wrap-around subarrays.",
+    ),
+]
+
+
 def generate_task(task_id: int, family: Family, rng: random.Random) -> dict:
     # Build hidden tests from sampled inputs; reference computes expected output.
     hidden_tests, seen = [], set()
@@ -658,11 +846,16 @@ def main():
     parser.add_argument("--count", type=int, default=1000, help="Number of tasks to generate.")
     parser.add_argument("--output", type=str, default="data/synthetic/algorithmic_tasks.jsonl")
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--set", choices=["standard", "hard", "all"], default="standard",
-                        help="Which family pool to draw from.")
+    parser.add_argument("--set", choices=["standard", "hard", "adversarial", "all"],
+                        default="standard", help="Which family pool to draw from.")
     args = parser.parse_args()
 
-    pool = {"standard": FAMILIES, "hard": HARD_FAMILIES, "all": FAMILIES + HARD_FAMILIES}[args.set]
+    pool = {
+        "standard": FAMILIES,
+        "hard": HARD_FAMILIES,
+        "adversarial": ADVERSARIAL_FAMILIES,
+        "all": FAMILIES + HARD_FAMILIES + ADVERSARIAL_FAMILIES,
+    }[args.set]
     rng = random.Random(args.seed)
     out_path = Path(args.output)
     out_path.parent.mkdir(parents=True, exist_ok=True)
