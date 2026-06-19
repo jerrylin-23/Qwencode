@@ -48,3 +48,6 @@ outputs/
 .vscode/
 .idea/
 .DS_Store
+
+# scratch eval logs
+reports/_*.log
