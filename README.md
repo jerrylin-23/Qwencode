@@ -5,7 +5,7 @@ A ML/SWE portfolio project focused on improving 7B-parameter open-weight coding 
 ## Key Features
 
 1. **Self-contained execution sandbox**: Safely runs generated code against unit tests, catching exceptions and compile errors in subprocesses.
-2. **Synthetic Data Generation**: High-quality algorithmic dataset generator across 16 categories with hidden tests and failure trajectories.
+2. **Synthetic Data Generation**: Algorithmic dataset generator built from genuine problem families (14 standard + 7 hard + 6 adversarial), each with a real reference solution that computes hidden-test outputs, plus execution-feedback failure trajectories.
 3. **Agentless Repair Loop**: Simple context localization, patch generation, applying patch, running test, and automatic retry from failing logs.
 4. **Fine-Tuning Utilities**: Scripts and configurations for training PEFT LoRA adapters.
 
@@ -60,16 +60,26 @@ For LoRA fine-tuning training, run:
 python -m code_model_lab.training.train_lora --config configs/training_lora.yaml
 ```
 
-## Results Summary (Baseline vs Improved)
+## Results Summary
 
-| Model | Evaluation Mode | Dataset | pass@1 | compile rate | avg retries | notes |
-|---|---|---|---|---|---|---|
-| Qwen2.5-Coder-7B | Direct Prompt | Algorithms | 50.0% | 100.0% | 0.00 | Direct answer prompt |
-| Qwen2.5-Coder-7B | Structured Prompt | Algorithms | 50.0% | 100.0% | 0.00 | Approach + edge-case structure |
-| Qwen2.5-Coder-7B | Structured + Retry | Algorithms | 100.0% | 100.0% | 0.50 | Debug-aware with retry loop |
-| Qwen2.5-Coder-7B | Structured Prompt | Practical | 100.0% | 100.0% | 0.00 | BigCodeBench-subset |
+Measured on the **base** `Qwen2.5-Coder-7B` with **live** local inference
+(`EVAL_MODE=real`), structured prompt, temperature 0.0. Full breakdown and
+documented failure modes in [`reports/error_analysis.md`](reports/error_analysis.md).
 
-*(Results based on mock evaluation run.)*
+| Eval tier | tasks | pass@1 | + execution-feedback retry |
+|---|---|---|---|
+| Standard canonical (14 families) | 28 | 92.9% | 100.0% |
+| Textbook-hard | 14 | 100.0% | 100.0% |
+| **Adversarial (famous-neighbour traps)** | 24 | **54.2%** | **70.8%** |
+
+**Takeaway:** canonical and even textbook-hard problems saturate; only
+adversarially-phrased problems discriminate. That 54.2% is the headroom a
+fine-tuned model would need to improve.
+
+**Not yet run (no numbers claimed):** LoRA fine-tuning (pipeline in
+[`notebooks/train_qlora.ipynb`](notebooks/train_qlora.ipynb)), real
+(non-mock) repository repair, and practical/BigCodeBench evaluation. See the
+*pending* sections in `reports/`.
 
 ## Project Structure
 

@@ -18,7 +18,7 @@ The key finding of the project so far: **problem difficulty does not separate
 this model from ceiling — problem *novelty* does.** Even textbook-hard LeetCode
 problems score 100% pass@1 because they sit squarely in the model's training
 distribution. Only problems phrased to *resemble* a famous problem while
-changing one requirement push pass@1 down to 58%. This is the eval tier with
+changing one requirement push pass@1 down to 54%. This is the eval tier with
 real headroom for fine-tuning to improve.
 
 ## Per-family behaviour on the adversarial set
@@ -90,7 +90,7 @@ semantic misreads but not the entrenched ones.
 ## Implications for the project
 
 - **Eval design:** canonical benchmarks (even "hard") will report ~ceiling and
-  cannot demonstrate fine-tuning gains. The adversarial tier (58% pass@1, 67%
+  cannot demonstrate fine-tuning gains. The adversarial tier (54% pass@1, 71%
   with retry) is where improvement is measurable. Expand it before training.
 - **Where SFT/execution-feedback tuning should help most:** teaching the model
   to *read constraints literally* and re-derive rather than autocomplete a

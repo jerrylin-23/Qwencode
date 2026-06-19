@@ -1,22 +1,44 @@
 # Ablation Study: Algorithmic Coding Tasks
 
-This report contains ablation studies comparing baseline prompting, structured prompting, and execution-feedback retry loops for algorithmic coding tasks using `Qwen2.5-Coder-7B-Instruct`.
+Effect of prompting style and the execution-feedback retry loop for
+`Qwen2.5-Coder-7B` on algorithmic coding.
+
+> **Status:** Base-model rows are **measured** (live inference, fixed harness,
+> 0 mock artifacts). SFT rows are **pending** — no adapter has been trained yet,
+> so those cells are left blank rather than filled with invented numbers.
 
 ## Evaluation Setup
-- **Dataset**: Custom synthetic algorithmic coding benchmark (50 easy, 50 medium, 20 hard tasks).
-- **Metric**: pass@1 rate (percentage of tasks passing all hidden unit tests).
-- **Execution Sandbox**: Subprocess execution with 2.0s timeout limit.
+- **Datasets:** standard canonical (28 tasks, 14 families), textbook-hard
+  (14 tasks), and adversarial traps (24 tasks). See `error_analysis.md`.
+- **Metric:** pass@1 (all hidden tests pass). Sandbox: subprocess, 2.0s timeout.
+- **Retry:** execution-feedback loop, ≤3 retries, failing test fed back.
 
-## Ablation Results
+## Measured: base model, by eval tier
+| Configuration | Standard pass@1 | Hard pass@1 | Adversarial pass@1 |
+|---|---|---|---|
+| Base, structured prompt (no retry) | 92.9% | 100.0% | 54.2% |
+| Base, structured + execution-feedback retry | 100.0% | 100.0% | 70.8% |
 
-| Method | pass@1 (%) | Compile Rate (%) | Average Retries | Notes |
-|---|---|---|---|---|
-| Base Model, direct prompt | 50.0% | 94.0% | 0.0 | Direct answer code-block only |
-| Base Model, structured prompt | 62.0% | 98.0% | 0.0 | Outputting approach and complexity explicitly |
-| Base Model, structured + retry | 86.0% | 100.0% | 0.8 | 3 retries max using raw compiler/failing output |
-| SFT Model, no retry | 78.0% | 100.0% | 0.0 | Fine-tuned on SFT mixture |
-| SFT Model + retry loop | **94.0%** | **100.0%** | **0.4** | Best overall configuration |
+**Reading:** canonical and textbook-hard problems saturate and do not
+discriminate. Only the adversarial tier has headroom, and execution feedback
+recovers part of it (54.2% → 70.8%) but not all — two families
+(`climb_no_double2`, `max_subarray_len2`) resist repair entirely.
 
-## Qualitative Findings
-1. **Structured Prompting**: Forcing the model to explicitly output `Approach:` and `Edge cases:` before generating the code blocks reduces trivial errors (such as off-by-one errors and missing edge case bounds) because it acts as a lightweight chain-of-thought.
-2. **Execution Feedback Retries**: Feeding compiler backtraces and AssertionError inputs directly back into the model's chat history is the single most effective way to repair logical errors, bumping the pass@1 from 62% to 86%.
+## Pending: SFT ablation (run via notebooks/train_qlora.ipynb)
+| Configuration | Adversarial pass@1 |
+|---|---|
+| Base (no fine-tune) | 54.2% (measured) |
+| SFT, solutions only | _pending_ |
+| SFT + execution-feedback trajectories | _pending_ |
+
+Comparing the last two rows is the experiment that would isolate
+execution-feedback fine-tuning as a cause of improvement. Until it is run, no
+SFT result is claimed.
+
+## Qualitative Findings (measured)
+1. **Structured prompting** (Approach / Edge cases before code) is the default;
+   we have not yet run a controlled direct-vs-structured comparison, so no
+   delta is claimed for it.
+2. **Execution-feedback retries** help on the adversarial tier (+16.6 points)
+   but cannot fix entrenched pattern-matching: `climb_no_double2` is solved as
+   plain Fibonacci even after three rounds of failing-test feedback.

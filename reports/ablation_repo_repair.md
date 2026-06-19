@@ -1,20 +1,33 @@
 # Ablation Study: Repository Repair
 
-This report analyzes the impact of retrieval-based fault localization and test-validation retry loops on SWE-bench-style repository bug repair.
+Planned analysis of retrieval-based fault localization and test-validation retry
+loops on SWE-bench-style repository bug repair using `mini_swe`.
+
+> **Status: NOT YET RUN with a live model.** The repair loop has so far only
+> been exercised in `EVAL_MODE=mock`, where the mock client returns canned
+> patches — those numbers measure the *harness*, not the model, and are not
+> reported here as results. The table below is the experiment design; all cells
+> are pending a real run (`EVAL_MODE=real`).
 
 ## Evaluation Setup
-- **Dataset**: `mini_swe` (10 custom python repositories with real bugs and unit tests).
-- **Metric**: Resolved percentage (all tests passing) and patch application success rate.
+- **Dataset:** `benchmarks/mini_swe` (10 Python repositories with logical bugs
+  and pytest configs).
+- **Metric:** resolved % (all tests pass after patch) and patch-apply %.
 
-## Ablation Results
+## Planned ablation (pending real run)
+| Method | Resolved % | Patch Applies % | Notes |
+|---|---|---|---|
+| Repair without retrieval | _pending_ | _pending_ | Full repo layout in context |
+| Repair with retrieval (top-3 files) | _pending_ | _pending_ | Agentless-style localization |
+| Retrieval + test-feedback retry | _pending_ | _pending_ | Apply → run pytest → re-query |
 
-| Method | Resolved % | Patch Applies % | Average Retries | Notes |
-|---|---|---|---|---|
-| Repo repair without retrieval | 20.0% | 40.0% | 0.0 | Prompts model with entire repo layout/files |
-| Repo repair with retrieval | 50.0% | 80.0% | 0.0 | Prompts model with top-3 likely files |
-| Repo repair with retrieval + test retry | **100.0%** | **100.0%** | **0.5** | Feed failed test outputs back for repair |
+## Hypotheses to test (not yet validated)
+1. **Context contamination:** prompting a 7B model with a full codebase layout
+   may produce patches that fail to apply or target the wrong file.
+2. **Agentless localization:** keyword/function-name retrieval should let the
+   model focus on the buggy file and raise patch-apply rate.
+3. **Execution-feedback retries:** apply-test-re-query may resolve bugs that a
+   single shot misses.
 
-## Key Insights
-1. **Context Window Contamination**: Prompting a 7B model with a full codebase layout or large irrelevant file contexts introduces distractions, causing it to generate patches that fail to apply or target the wrong files.
-2. **Agentless Fault Localization**: A simple keyword and function name match retrieval step allows the model to focus on the exact buggy file, raising the patch application rate from 40% to 80%.
-3. **Execution Feedback Retries**: Letting the agent apply a patch, run pytest, capture traceback failures, and re-query the model enables automatic code repair. Most bugs are resolved in a single retry.
+These are stated as hypotheses, not findings. Run the loop in real mode and
+fill the table before drawing conclusions.
