@@ -10,7 +10,9 @@ mock fallback; 300s timeout). 0 mock artifacts in any run reported here.
 |---|---|---|---|
 | Standard canonical (14 families) | 28 | 92.9% | 100.0% |
 | Textbook-hard (decode_ways, edit_distance, LIS, trap, …) | 14 | 100.0% | 100.0% |
-| **Adversarial (famous-neighbour traps)** | 12 | **58.3%** | **66.7%** |
+| **Adversarial (famous-neighbour traps)** | 24 | **54.2%** | **70.8%** |
+
+Adversarial set: 6 families × 4 variants, balanced 12 medium / 12 hard.
 
 The key finding of the project so far: **problem difficulty does not separate
 this model from ceiling — problem *novelty* does.** Even textbook-hard LeetCode
@@ -21,18 +23,22 @@ real headroom for fine-tuning to improve.
 
 ## Per-family behaviour on the adversarial set
 
-| Family | trap (famous neighbour) | pass@1 | recovered by retry? |
-|---|---|---|---|
-| `count_pairs_below` | two-sum (find one equal pair) | pass | — |
-| `second_largest_distinct` | `sorted[-2]` incl. duplicates | pass | — |
-| `lower_bound` | exact-match binary search | pass | — |
-| `max_circular_subarray` | plain Kadane (no wrap) | fail | **yes** (1 retry) |
-| `climb_no_double2` | Fibonacci stairs | fail | **no** (still fails after 3) |
-| `max_subarray_len2` | plain Kadane (len ≥ 1) | fail | **no** (still fails after 3) |
+Per family (4 variants each):
 
-The model resists three traps cleanly, is nudged out of one by execution
-feedback, and stays **locked onto the famous neighbour for two** even after
-repeated failing-test feedback. Those two are the genuine discriminators.
+| Family | trap (famous neighbour) | pass@1 | + retry |
+|---|---|---|---|
+| `count_pairs_below` | two-sum (find one equal pair) | 4/4 | — |
+| `second_largest_distinct` | `sorted[-2]` incl. duplicates | 4/4 | — |
+| `lower_bound` | exact-match binary search | 4/4 | — |
+| `max_subarray_len2` | plain Kadane (len ≥ 1) | 1/4 | 2/4 |
+| `max_circular_subarray` | plain Kadane (no wrap) | 0/4 | 2/4 |
+| `climb_no_double2` | Fibonacci stairs | 0/4 | 1/4 |
+
+The model resists three traps cleanly and is consistently fooled by the other
+three. The two Kadane-variant families and the Fibonacci-stairs family are the
+genuine discriminators: execution feedback only half-recovers them, and
+`climb_no_double2` stays locked onto Fibonacci even after repeated failing-test
+feedback (1/4 even with retries).
 
 ## Representative persistent failures (resist the retry loop)
 
