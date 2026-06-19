@@ -186,6 +186,108 @@ def _subset_count_ref(nums):
 
 
 # --------------------------------------------------------------------------
+# Reference solutions — hard families
+# --------------------------------------------------------------------------
+
+def _decode_ways_ref(s):
+    if not s or s[0] == "0":
+        return 0
+    n = len(s)
+    dp = [0] * (n + 1)
+    dp[0] = dp[1] = 1
+    for i in range(2, n + 1):
+        if s[i - 1] != "0":
+            dp[i] += dp[i - 1]
+        if 10 <= int(s[i - 2:i]) <= 26:
+            dp[i] += dp[i - 2]
+    return dp[n]
+
+
+def _next_permutation_ref(nums):
+    a = list(nums)
+    n = len(a)
+    i = n - 2
+    while i >= 0 and a[i] >= a[i + 1]:
+        i -= 1
+    if i >= 0:
+        j = n - 1
+        while a[j] <= a[i]:
+            j -= 1
+        a[i], a[j] = a[j], a[i]
+    a[i + 1:] = reversed(a[i + 1:])
+    return a
+
+
+def _trap_ref(height):
+    if not height:
+        return 0
+    lo, hi = 0, len(height) - 1
+    lmax = rmax = res = 0
+    while lo < hi:
+        if height[lo] < height[hi]:
+            lmax = max(lmax, height[lo])
+            res += lmax - height[lo]
+            lo += 1
+        else:
+            rmax = max(rmax, height[hi])
+            res += rmax - height[hi]
+            hi -= 1
+    return res
+
+
+def _lis_ref(nums):
+    import bisect
+    tails = []
+    for x in nums:
+        i = bisect.bisect_left(tails, x)
+        if i == len(tails):
+            tails.append(x)
+        else:
+            tails[i] = x
+    return len(tails)
+
+
+def _edit_distance_ref(a, b):
+    m, n = len(a), len(b)
+    dp = list(range(n + 1))
+    for i in range(1, m + 1):
+        prev = dp[0]
+        dp[0] = i
+        for j in range(1, n + 1):
+            cur = dp[j]
+            if a[i - 1] == b[j - 1]:
+                dp[j] = prev
+            else:
+                dp[j] = 1 + min(prev, dp[j], dp[j - 1])
+            prev = cur
+    return dp[n]
+
+
+def _max_profit_two_ref(prices):
+    buy1 = buy2 = float("-inf")
+    sell1 = sell2 = 0
+    for p in prices:
+        buy1 = max(buy1, -p)
+        sell1 = max(sell1, buy1 + p)
+        buy2 = max(buy2, sell1 - p)
+        sell2 = max(sell2, buy2 + p)
+    return sell2
+
+
+def _largest_rectangle_ref(heights):
+    stack = []
+    best = 0
+    for i, h in enumerate(heights + [0]):
+        start = i
+        while stack and stack[-1][1] > h:
+            idx, height = stack.pop()
+            best = max(best, height * (i - idx))
+            start = idx
+        stack.append((start, h))
+    return best
+
+
+# --------------------------------------------------------------------------
 # Input samplers
 # --------------------------------------------------------------------------
 
@@ -214,6 +316,34 @@ def _binary_search_sampler(rng):
 def _kth_largest_sampler(rng):
     arr = _rand_list(rng, n_lo=1, n_hi=10)
     return (arr, rng.randint(1, len(arr)))
+
+
+def _decode_sampler(rng):
+    # Weight toward 1/2 and zeros to exercise the tricky boundary cases.
+    digits = "112233045"
+    return ("".join(rng.choice(digits) for _ in range(rng.randint(1, 9))),)
+
+
+def _perm_sampler(rng):
+    return (rng.sample(range(1, 10), rng.randint(2, 6)),)
+
+
+def _trap_sampler(rng):
+    return ([rng.randint(0, 6) for _ in range(rng.randint(2, 12))],)
+
+
+def _two_str_sampler(rng):
+    def word():
+        return "".join(rng.choice("abc") for _ in range(rng.randint(0, 6)))
+    return (word(), word())
+
+
+def _prices_sampler(rng):
+    return ([rng.randint(0, 30) for _ in range(rng.randint(1, 12))],)
+
+
+def _hist_sampler(rng):
+    return ([rng.randint(0, 8) for _ in range(rng.randint(1, 10))],)
 
 
 # --------------------------------------------------------------------------
@@ -373,6 +503,89 @@ FAMILIES: List[Family] = [
 ]
 
 
+# Harder families: multi-step, edge-case heavy, or adversarially phrased to lure
+# the model toward a more famous (but wrong) problem. These are meant to push
+# first-attempt pass@1 below ceiling so the eval can discriminate model ability.
+HARD_FAMILIES: List[Family] = [
+    Family(
+        "decode_ways", "decode_ways", "hard", ["dynamic programming", "strings"],
+        "A digit string is decoded by mapping '1'->'A' ... '26'->'Z'. Given a "
+        "string `s` of digits, return the number of distinct ways to decode it. "
+        "A leading '0' or any standalone '0' that cannot pair into 10-26 yields 0 ways.",
+        "1 <= s.length <= 100\ns consists of digits only",
+        "def decode_ways(s):\n    if not s or s[0] == '0':\n        return 0\n    n = len(s)\n    dp = [0] * (n + 1)\n    dp[0] = dp[1] = 1\n    for i in range(2, n + 1):\n        if s[i - 1] != '0':\n            dp[i] += dp[i - 1]\n        if 10 <= int(s[i - 2:i]) <= 26:\n            dp[i] += dp[i - 2]\n    return dp[n]",
+        _decode_ways_ref, _decode_sampler,
+        "O(N)", "O(1)",
+        "DP where dp[i] sums one-digit (if s[i-1]!='0') and two-digit (if 10..26) decodings. The '0' cases are the trap.",
+        "def decode_ways(s):\n    n = len(s)\n    dp = [1] * (n + 1)\n    for i in range(2, n + 1):\n        dp[i] = dp[i - 1] + (dp[i - 2] if 10 <= int(s[i-2:i]) <= 26 else 0)\n    return dp[n]",
+        "Ignores '0' handling, so strings containing '0' are mis-counted.",
+    ),
+    Family(
+        "next_permutation", "next_permutation", "hard", ["arrays", "math/combinatorics"],
+        "Given a list `nums`, return the next lexicographically greater "
+        "permutation of its elements. If no greater permutation exists, return "
+        "the smallest (sorted ascending) permutation.",
+        "1 <= nums.length <= 100",
+        "def next_permutation(nums):\n    a = list(nums)\n    n = len(a)\n    i = n - 2\n    while i >= 0 and a[i] >= a[i + 1]:\n        i -= 1\n    if i >= 0:\n        j = n - 1\n        while a[j] <= a[i]:\n            j -= 1\n        a[i], a[j] = a[j], a[i]\n    a[i + 1:] = reversed(a[i + 1:])\n    return a",
+        _next_permutation_ref, _perm_sampler,
+        "O(N)", "O(1)",
+        "Find the rightmost ascending pair, swap with the next-larger suffix element, then reverse the suffix.",
+    ),
+    Family(
+        "trapping_rain_water", "trap", "hard", ["two pointers", "arrays"],
+        "Given non-negative integers `height` representing an elevation map where "
+        "each bar has width 1, return how many units of water it can trap after raining.",
+        "1 <= height.length <= 10^4\n0 <= height[i] <= 10^5",
+        "def trap(height):\n    if not height:\n        return 0\n    lo, hi = 0, len(height) - 1\n    lmax = rmax = res = 0\n    while lo < hi:\n        if height[lo] < height[hi]:\n            lmax = max(lmax, height[lo])\n            res += lmax - height[lo]\n            lo += 1\n        else:\n            rmax = max(rmax, height[hi])\n            res += rmax - height[hi]\n            hi -= 1\n    return res",
+        _trap_ref, _trap_sampler,
+        "O(N)", "O(1)",
+        "Two pointers moving inward; water at each bar is bounded by the smaller of the running left/right maxima.",
+    ),
+    Family(
+        "lis", "length_of_lis", "hard", ["dynamic programming", "binary search"],
+        "Given an integer array `nums`, return the length of the longest strictly "
+        "increasing subsequence (not necessarily contiguous).",
+        "1 <= nums.length <= 2500",
+        "def length_of_lis(nums):\n    import bisect\n    tails = []\n    for x in nums:\n        i = bisect.bisect_left(tails, x)\n        if i == len(tails):\n            tails.append(x)\n        else:\n            tails[i] = x\n    return len(tails)",
+        _lis_ref, lambda rng: (_rand_list(rng, lo=-10, hi=10, n_lo=1, n_hi=12),),
+        "O(N log N)", "O(N)",
+        "Patience sorting: keep the smallest possible tail for each subsequence length via binary search.",
+    ),
+    Family(
+        "edit_distance", "edit_distance", "hard", ["dynamic programming", "strings"],
+        "Given two strings `a` and `b`, return the minimum number of single-"
+        "character insertions, deletions, or substitutions to turn `a` into `b`.",
+        "0 <= a.length, b.length <= 500",
+        "def edit_distance(a, b):\n    m, n = len(a), len(b)\n    dp = list(range(n + 1))\n    for i in range(1, m + 1):\n        prev = dp[0]\n        dp[0] = i\n        for j in range(1, n + 1):\n            cur = dp[j]\n            if a[i - 1] == b[j - 1]:\n                dp[j] = prev\n            else:\n                dp[j] = 1 + min(prev, dp[j], dp[j - 1])\n            prev = cur\n    return dp[n]",
+        _edit_distance_ref, _two_str_sampler,
+        "O(M*N)", "O(N)",
+        "Levenshtein DP over the two strings with a rolling row.",
+    ),
+    Family(
+        "max_profit_two", "max_profit_two", "hard", ["dynamic programming", "greedy"],
+        "Given daily stock `prices`, return the maximum profit using AT MOST TWO "
+        "non-overlapping buy/sell transactions (you must sell before buying again).",
+        "1 <= prices.length <= 10^5\n0 <= prices[i] <= 10^5",
+        "def max_profit_two(prices):\n    buy1 = buy2 = float('-inf')\n    sell1 = sell2 = 0\n    for p in prices:\n        buy1 = max(buy1, -p)\n        sell1 = max(sell1, buy1 + p)\n        buy2 = max(buy2, sell1 - p)\n        sell2 = max(sell2, buy2 + p)\n    return sell2",
+        _max_profit_two_ref, _prices_sampler,
+        "O(N)", "O(1)",
+        "Track four running states: best profit after the 1st buy, 1st sell, 2nd buy, 2nd sell.",
+        "def max_profit_two(prices):\n    lo = prices[0]\n    best = 0\n    for p in prices[1:]:\n        best = max(best, p - lo)\n        lo = min(lo, p)\n    return best",
+        "Solves the single-transaction problem, ignoring the second allowed trade.",
+    ),
+    Family(
+        "largest_rectangle", "largest_rectangle", "hard", ["stacks/queues", "arrays"],
+        "Given `heights` of histogram bars each of width 1, return the area of the "
+        "largest rectangle that fits entirely within the histogram.",
+        "1 <= heights.length <= 10^5\n0 <= heights[i] <= 10^4",
+        "def largest_rectangle(heights):\n    stack = []\n    best = 0\n    for i, h in enumerate(heights + [0]):\n        start = i\n        while stack and stack[-1][1] > h:\n            idx, height = stack.pop()\n            best = max(best, height * (i - idx))\n            start = idx\n        stack.append((start, h))\n    return best",
+        _largest_rectangle_ref, _hist_sampler,
+        "O(N)", "O(N)",
+        "Monotonic increasing stack; when a shorter bar arrives, pop and settle rectangles using the recorded start index.",
+    ),
+]
+
+
 def generate_task(task_id: int, family: Family, rng: random.Random) -> dict:
     # Build hidden tests from sampled inputs; reference computes expected output.
     hidden_tests, seen = [], set()
@@ -445,8 +658,11 @@ def main():
     parser.add_argument("--count", type=int, default=1000, help="Number of tasks to generate.")
     parser.add_argument("--output", type=str, default="data/synthetic/algorithmic_tasks.jsonl")
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--set", choices=["standard", "hard", "all"], default="standard",
+                        help="Which family pool to draw from.")
     args = parser.parse_args()
 
+    pool = {"standard": FAMILIES, "hard": HARD_FAMILIES, "all": FAMILIES + HARD_FAMILIES}[args.set]
     rng = random.Random(args.seed)
     out_path = Path(args.output)
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -455,13 +671,13 @@ def main():
     with open(out_path, "w", encoding="utf-8") as f:
         for i in range(1, args.count + 1):
             # Round-robin the first pass so every family is represented, then random.
-            family = FAMILIES[(i - 1) % len(FAMILIES)] if i <= len(FAMILIES) else rng.choice(FAMILIES)
+            family = pool[(i - 1) % len(pool)] if i <= len(pool) else rng.choice(pool)
             task = generate_task(i, family, rng)
             f.write(json.dumps(task) + "\n")
             written += 1
 
     print(f"Generated {written} synthetic algorithmic tasks across "
-          f"{len(FAMILIES)} problem families saved to {out_path}.")
+          f"{len(pool)} '{args.set}' problem families saved to {out_path}.")
 
 
 if __name__ == "__main__":
