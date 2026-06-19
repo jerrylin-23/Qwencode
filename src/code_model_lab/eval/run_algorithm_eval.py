@@ -9,6 +9,7 @@ from rich.console import Console
 from rich.table import Table
 
 from code_model_lab.models import prompt_templates
+from code_model_lab.models.ollama_client import GenerationError
 from code_model_lab.eval.sandbox import run_in_sandbox
 
 console = Console()
@@ -112,9 +113,19 @@ def run_eval(config_path: Path):
             )
             
         t0 = time.time()
-        model_output = client.generate(prompt, temperature=0.0)
+        try:
+            model_output = client.generate(prompt, temperature=0.0)
+        except GenerationError as e:
+            latency = time.time() - t0
+            console.print(f"[bold red]Task {task_id}: generation error[/bold red] ({e})")
+            results.append({
+                "id": task_id, "entrypoint": entrypoint, "status": "generation_error",
+                "passed": False, "compiled": False, "retries": 0,
+                "latency": latency, "code": "", "sandbox_results": {"status": "generation_error"},
+            })
+            continue
         latency = time.time() - t0
-        
+
         code = extract_code(model_output, entrypoint)
         
         # Sandbox execution
@@ -151,9 +162,13 @@ def run_eval(config_path: Path):
                 test_output=test_output
             )
             
-            model_output = client.generate(repair_prompt, temperature=0.0)
+            try:
+                model_output = client.generate(repair_prompt, temperature=0.0)
+            except GenerationError as e:
+                console.print(f"[red]  Repair generation error: {e}[/red]")
+                break
             code = extract_code(model_output, entrypoint)
-            
+
             sandbox_res = run_in_sandbox(
                 code=code,
                 entrypoint=entrypoint,

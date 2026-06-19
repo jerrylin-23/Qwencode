@@ -29,5 +29,6 @@ def get_model_client(m_config: Dict[str, Any]) -> Any:
         return OllamaClient(
             model_name=m_config.get("model_name", "qwen2.5-coder:7b"),
             api_base=m_config.get("api_base", "http://localhost:11434/api"),
-            eval_mode=eval_mode
+            eval_mode=eval_mode,
+            timeout=m_config.get("timeout", 300.0),
         )

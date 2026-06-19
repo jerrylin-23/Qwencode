@@ -3,11 +3,28 @@ import re
 import json
 import requests
 
+
+class GenerationError(RuntimeError):
+    """Raised when a real-mode generation request fails.
+
+    We deliberately do NOT silently fall back to mock output in real mode: a
+    mock response masquerading as a model answer fabricates evaluation data
+    (fake passes or fake failures). Callers should record an explicit error.
+    """
+
+
 class OllamaClient:
-    def __init__(self, model_name: str = "qwen2.5-coder:7b", api_base: str = "http://localhost:11434/api", eval_mode: str = "mock"):
+    def __init__(self, model_name: str = "qwen2.5-coder:7b",
+                 api_base: str = "http://localhost:11434/api",
+                 eval_mode: str = "mock", timeout: float = 300.0,
+                 keep_alive: str = "10m"):
         self.model_name = model_name
         self.api_base = api_base
         self.eval_mode = os.getenv("EVAL_MODE", eval_mode)
+        self.timeout = float(os.getenv("OLLAMA_TIMEOUT", timeout))
+        self.keep_alive = keep_alive
+        # Opt-in only: never silently fabricate data in a real eval.
+        self.allow_mock_fallback = os.getenv("ALLOW_MOCK_FALLBACK", "0") == "1"
 
     def generate(self, prompt: str, temperature: float = 0.0, max_tokens: int = 2048) -> str:
         if self.eval_mode == "mock":
@@ -35,6 +52,7 @@ class OllamaClient:
                 "model": self.model_name,
                 "prompt": prompt,
                 "stream": False,
+                "keep_alive": self.keep_alive,
                 "options": {
                     "temperature": temperature,
                     "num_predict": max_tokens
@@ -42,7 +60,7 @@ class OllamaClient:
             }
 
         try:
-            response = requests.post(url, json=payload, headers=headers, timeout=60)
+            response = requests.post(url, json=payload, headers=headers, timeout=self.timeout)
             response.raise_for_status()
             res_json = response.json()
             if is_openai:
@@ -50,9 +68,11 @@ class OllamaClient:
             else:
                 return res_json.get("response", "")
         except Exception as e:
-            # Fallback to mock with a warning if connection fails
-            print(f"Cloud/Ollama connection failed ({e}). Falling back to mock response.")
-            return self._mock_generate(prompt)
+            if self.allow_mock_fallback:
+                print(f"Ollama request failed ({e}). ALLOW_MOCK_FALLBACK=1 -> mock response.")
+                return self._mock_generate(prompt)
+            # Do not fabricate eval data: surface the failure to the caller.
+            raise GenerationError(f"Ollama request to {url} failed: {e}") from e
 
     def _mock_generate(self, prompt: str) -> str:
         # Mock logic to return valid responses for the evaluation and repair tasks
