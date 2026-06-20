@@ -2,6 +2,8 @@
 
 A ML/SWE portfolio project focused on improving 7B-parameter open-weight coding models (e.g., `Qwen2.5-Coder-7B`) on algorithmic problem solving (LeetCode-style) and repository-level software repair (SWE-bench-style).
 
+> **Continuation of** [DeepSeek-LeetCode-Oriented-Training](https://github.com/jerrylin-23/DeepSeek-LeetCode-Oriented-Training), which fine-tuned DeepSeek-Coder 6.7B on LeetCode-style problems (24% → 34% accuracy). This project carries that work forward to `Qwen2.5-Coder-7B` and broadens it from raw accuracy into a full evaluation-and-repair system: a discriminating adversarial eval, execution-feedback data, leakage-controlled SFT, and a QLoRA training pipeline.
+
 ## Key Features
 
 1. **Self-contained execution sandbox**: Safely runs generated code against unit tests, catching exceptions and compile errors in subprocesses.
